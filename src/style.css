@@ -19,7 +19,7 @@ body {
 
 #div-container {
   border-style: solid;
-  border-color: rgb(1, 36, 100);
+  border-color: #000000;
   border-width: 5px;
   background: white;
   }
@@ -27,42 +27,42 @@ body {
  #div-show {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  /* width: 100px; /*
-    /* height: auto;
-    margin: 0 auto;
-    padding: 10px;
-    position: relative; */ 
-    
   }  
 
   #div-item-container {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      /* border-style: solid;
-      border-color: rgb(1, 36, 100);
-      border-width: 5px; */
+      padding: 30px;
       margin: 30px;
       background: beige;
   }
 
- #div-item, #div-info {
-  border-style: solid;
-  border-color: rgb(1, 36, 100);
-  border-width: 5px;
- }
+  .col-4 {
+    text-align: center;
+  }
+
+
+/* divs for the show shirt page*/
+  #div-item {
+    border: solid;
+    padding: 20px;
+  }
+
+  #div-info {
+  /* background: white; */
+  width: 410px;
+  height: 648px;
+  padding: 20px;
+  
+ } 
 
  #div-select {
   text-align:center;
  }
 
 
-
-
-
  .div-item {
     padding: 20px;
     border-style: solid;
-    border-color: rgb(1, 36, 100);
+    border-color: #000000;
      border-width: 5px;
      margin: 30px;
      background: white;
@@ -71,10 +71,21 @@ body {
  .item-image {
   height: 200px;
   width:200px;
-  padding-left: 65px;
+  /* padding-left: 65px; */
   
  }
 
+
+
+ ul#horizontal-list {
+  text-align: center;
+  list-style-type: none;
+}
+ul#horizontal-list li {
+  text-align: center;
+  display: inline;
+  padding: 5px;
+}
 
 
 p {

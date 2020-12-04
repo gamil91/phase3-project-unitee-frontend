@@ -1,8 +1,13 @@
+
+
 const navShirts = document.querySelector("#shirts")
 navShirts.addEventListener("click", getItems)
 
 const navCart = document.querySelector("#cart")
 navCart.addEventListener("click", getCart)
+
+const checkoutSaveBtn = document.getElementById("checkout-btn")
+checkoutSaveBtn.addEventListener("click", checkOutCart)
 
 //bigdiv
 const div = document.querySelector("#div-container")
@@ -67,8 +72,6 @@ function handleDivEvents(e){
         .then(res => res.json())
         .then(item => showItem(item))
     }
-   
-
 }
 
 function showItem(item){
@@ -208,6 +211,8 @@ function createCart(){
     .then(cart => cartObj = cart)
 }
 
+
+
 function getCart(){
     
     fetch("http://localhost:3000/cart_items")
@@ -215,15 +220,19 @@ function getCart(){
     .then(cart => viewCart(cart))
 }
 
+
+
 function viewCart(cart){
     
     cartTable.innerHTML = ""
     if (cart.length == 0 ){
         cartTable.innerHTML = `<p>is empty</p>`
-        document.getElementById("checkout-btn").disabled = true;
+        // document.getElementById("checkout-btn").disabled = true;
+        checkoutSaveBtn.disabled = true
     }
     else {
-        document.getElementById("checkout-btn").disabled = false;
+    // checkoutSaveBtn = document.getElementById("checkout-btn").disabled = false;
+    checkoutSaveBtn.disabled = false
     cartTable.innerHTML = `
     
     <tr>
@@ -232,8 +241,8 @@ function viewCart(cart){
             <th>Size</th>
             <th>Quantity</th>
             <th>Subtotal</th>
-            <th></th>
-            <th>Remove</th>
+            <th data-html2canvas-ignore></th>
+            <th data-html2canvas-ignore>Remove</th>
     </tr>`
 
     priceArr = []
@@ -278,9 +287,12 @@ function viewCart(cart){
         priceTd.textContent = `${cartItemObj.quantity} x $${cartItemObj.item.price} = $${subtotal}`
         
         const blankTd = document.createElement("td")
+        blankTd.setAttribute('data-html2canvas-ignore','')
+
         const removeTd = document.createElement("td")
         removeTd.className = "remove"
         removeTd.id = cartItemObj.id
+        removeTd.setAttribute('data-html2canvas-ignore','')
         removeTd.textContent = "x"
 
         itemRow.append(nameTd, colorTd, sizeTd, quantityTd, priceTd, blankTd, removeTd)
@@ -288,28 +300,31 @@ function viewCart(cart){
     })
 
         const subTotal = priceArr.reduce(function(total, price){return parseInt(total) + parseInt(price)})
-        const tax = subTotal * 0.725
-        const grandTotal = parseInt(subTotal) + parseInt(tax)
+        const tax = Math.floor((subTotal * 0.0725)*100)/100        
+        const grandTotal = parseFloat(subTotal) + parseFloat(tax)
 
         const subtotalTr = document.createElement("tr")
         subtotalTr.innerHTML = `<td></td><td></td>
         <td></td><td>Subtotal</td><td>$${subTotal}</td>
-        <td></td><td></td>`
+        `
 
         const taxesTr = document.createElement("tr")
         taxesTr.innerHTML = `<td></td><td></td>
         <td></td><td>Tax 7.25%</td><td>$${tax}</td>
-        <td></td><td></td>`
+        `
 
         const totalTr = document.createElement("tr")
         totalTr.innerHTML = `<td></td><td></td>
         <td></td><td font-weight"bold">Total</td><td>$${grandTotal}</td>
-        <td></td><td></td>`
+        `
 
       cartTable.append(subtotalTr, taxesTr, totalTr)  
-
+      
     }
+    
 }
+
+
 
 function updateQuantity(e){
     
@@ -332,6 +347,9 @@ function updateQuantity(e){
 
 }
 
+
+
+
 function deleteCartItem(e){
     if (e.target.className == "remove"){
         cartItemId = e.target.id
@@ -340,4 +358,28 @@ function deleteCartItem(e){
     }
     
 }
+
+
+
+function checkOutCart (){
+    const receiptCart = document.querySelector("#receiptCart")
+    
+    const receiptTitle = document.createElement("h4")
+    receiptTitle.textContent = "uniTee Receipt"
+    
+    receiptCart.prepend(receiptTitle)
+    const receipt = document.querySelector("#collapseCart")
+
+const opt = {
+    margin: 0.5,
+    filename: 'uniTeeReceipt.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+};
+html2pdf().from(receipt).set(opt).save().then(getCart)
+
+
+} 
+
 

@@ -9,22 +9,23 @@
         <link rel="preconnect" href="https://fonts.gstatic.com">
         <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300&display=swap" rel="stylesheet">
         <title>UNITee</title>
+
+        
+        <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.js"></script>
     </head>
 
     <body>
 
-        <div class="jumbotron jumbotron-fluid">
+        <!-- <div class="jumbotron jumbotron-fluid"> -->
             <div class="container">
-              <h1 class="display-4">UNITee</h1>
-              <p class="lead">A one stop shop where there is a Tee for both U...N...I!</p>
+              <img src="https://i.postimg.cc/XJ0spwFP/24e841de-6996-43b2-91b0-4b04210b0448-200x200.png" class="item-image">
+              <!-- <p class="lead">A one stop shop where there is a Tee for both U...N...I!</p> -->
             </div>
-          </div>
+          <!-- </div> -->
 
 
-
+<!-- NavBar  -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        
-        
         <div class="collapse navbar-collapse" id="navbarNav" >
           <ul class="navbar-nav">
             <li class="nav-item active">
@@ -37,12 +38,12 @@
             </li>
             <li class="nav-item nav-link" id="cart" data-toggle="collapse" data-target="#collapseCart" aria-expanded="false" aria-controls="collapseCart">Cart</li>
                 <div class="collapse" id="collapseCart">
-                    <div class="card card-body">
-                        <h4 data-toggle="collapse" data-target="#collapseCart" aria-expanded="false" aria-controls="collapseCart"> Your Shopping Cart </h4>
+                    <div class="card card-body" id="receiptCart">
+                        <h4 data-toggle="collapse" data-target="#collapseCart" aria-expanded="false" aria-controls="collapseCart" data-html2canvas-ignore> Your Shopping Cart </h4>
                         <table id="cart-table">
                             
                         </table>
-                        <button id="checkout-btn" class="btn btn-primary mb-2">Checkout Cart</button>
+                        <button id="checkout-btn" class="btn btn-primary mb-2" data-html2canvas-ignore>Checkout Cart</button>
                     </div>
                 </div>
            
@@ -57,16 +58,18 @@
         <div id="div-container" class="container"></div>
 
             <div id="div-item-container" class="row">
-
             </div>
             
 
         </div>
-        <br/>
-        <br/>
+        
+    <br/>
+    <br/>
 
     </body>
+    
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script> 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+    
     <script src="./index.js"></script>
 </html>

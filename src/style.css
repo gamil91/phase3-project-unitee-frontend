@@ -16,7 +16,7 @@ body {
   padding: 5px;
   text-align: center;
   width: 120px;
-  border-bottom: 1px solid #ddd;
+  /* border-bottom: 1px solid #ddd; */
   
 }
 
@@ -30,9 +30,16 @@ body {
   color: Black;
 }
 
+.jumbotron {
+  margin: 20px;
+  padding: 0;
+  height: 250px;
+}
+
+
 #div-container {
   border-style: solid;
-  border-color: #000000;
+  border-color: #01233f;
   border-width: 5px;
   background: white;
   }
@@ -71,7 +78,7 @@ body {
  .div-item {
     padding: 20px;
     border-style: solid;
-    border-color: #000000;
+    border-color: #01233f;
      border-width: 5px;
      margin: 30px;
      background: white;

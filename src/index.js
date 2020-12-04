@@ -9,7 +9,7 @@ const div = document.querySelector("#div-container")
 div.addEventListener("click", handleDivEvents)
 
 let cartTable = document.querySelector("#cart-table")
-cartTable.addEventListener("click", handleCartEvents)
+cartTable.addEventListener("click", deleteCartItem)
 
 //innerdiv
 const divItemContainer = document.querySelector("#div-item-container")
@@ -28,8 +28,8 @@ divForm.id = "div-select"
 
 
 getItems()
-createCart()
-let cartObj 
+// createCart()
+// let cartObj 
 
 function getItems(){
     div.innerHTML = ""
@@ -94,7 +94,7 @@ function showItem(item){
 
     // divForm.append(label, selectColor)
     divForm.innerHTML = `
-    <form>
+    <form id="form-add">
     <div class="form-group">
         <select class="form-control custom-select" id="selectQuantity" name="quantity" required>
         <option value="">Quantity</option>
@@ -120,7 +120,7 @@ function showItem(item){
         <option value="Extra Large">Extra Large</option>
         </select>
     </div>
-    <button type="submit" class="btn btn-primary mb-2">Add to cart</button>
+    <button type="submit" class="btn btn-primary mb-2" >Add to cart</button>
     </form>
     `
 
@@ -160,20 +160,21 @@ function showItem(item){
             selectColor.appendChild(option)
         })
 
-    const form = document.querySelector("form")
+    const form = document.querySelector("#form-add")
     form.addEventListener("submit", (e) => addToCart(e, item) )
 
 }
 
 function addToCart(e, item){
     e.preventDefault()
-    
+    cartObj = 218
+
     formData = {
         quantity: e.target.quantity.value,
         color: e.target.color.value,
         size: e.target.size.value,
         item_id: item.id,
-        cart_id: cartObj.id 
+        cart_id: cartObj 
     }
     
     configObj = {
@@ -200,10 +201,8 @@ function reloadCart(){
 function createCart(){
     fetch("http://localhost:3000/carts", {
         method: "POST",
-        headers: {
-            "Content-Type" : "application/json",
-            "accept" : "application/json"
-        }
+        headers: {"Content-Type" : "application/json",
+                "accept" : "application/json"}
     })
     .then(res => res.json())
     .then(cart => cartObj = cart)
@@ -217,57 +216,127 @@ function getCart(){
 }
 
 function viewCart(cart){
-
+    
     cartTable.innerHTML = ""
     if (cart.length == 0 ){
-        cartTable.innerHTML = `<p>Your shopping cart is empty</p>`
+        cartTable.innerHTML = `<p>is empty</p>`
+        document.getElementById("checkout-btn").disabled = true;
     }
-else {
-    cartTable.innerHTML = `<tr>
-    <th>Item Name</th>
-    <th>Color</th>
-    <th>Size</th>
-    <th>Quantity</th>
-    <th></th>
-</tr>`
+    else {
+        document.getElementById("checkout-btn").disabled = false;
+    cartTable.innerHTML = `
     
+    <tr>
+            <th>Item Name</th>
+            <th>Color</th>
+            <th>Size</th>
+            <th>Quantity</th>
+            <th>Subtotal</th>
+            <th></th>
+            <th>Remove</th>
+    </tr>`
+
+    priceArr = []
     cart.forEach(cartItemObj => {
-        itemRow = document.createElement("tr")
-        nameTd = document.createElement("td")
+        
+        const itemRow = document.createElement("tr")
+        const nameTd = document.createElement("td")
         nameTd.textContent = cartItemObj.item.name
         
-        colorTd = document.createElement("td")
+        const colorTd = document.createElement("td")
         color = cartItemObj.color
         colorTd.textContent = color.charAt(0).toUpperCase() + color.slice(1)
 
-        sizeTd = document.createElement("td")
+        const sizeTd = document.createElement("td")
         sizeTd.textContent = cartItemObj.size
 
-        quantityTd = document.createElement("td")
-        quantityTd.textContent = cartItemObj.quantity
+        const quantityTd = document.createElement("td")
+        quantityTd.className = "quantity-row"
+            const select = document.createElement("select");
+            select.className = "form-update form-control custom-select";
+            select.id = cartItemObj.id
+            select.addEventListener("change", (e) => updateQuantity(e))
 
-        removeTd = document.createElement("td")
+            const placementHolder = document.createElement("option");
+            placementHolder.value = "";
+            placementHolder.text = cartItemObj.quantity;
+            select.appendChild(placementHolder)
+            
+                let values = [1, 2, 3, 4, 5];
+                for (const val of values) {
+                let option = document.createElement("option");
+                option.value = val;
+                option.text = val;
+                select.appendChild(option);
+                }
+        quantityTd.appendChild(select)
+
+        const priceTd = document.createElement("td")
+        const subtotal = `${cartItemObj.quantity * cartItemObj.item.price}`
+        
+        priceArr.push(subtotal)
+        priceTd.textContent = `${cartItemObj.quantity} x $${cartItemObj.item.price} = $${subtotal}`
+        
+        const blankTd = document.createElement("td")
+        const removeTd = document.createElement("td")
         removeTd.className = "remove"
         removeTd.id = cartItemObj.id
         removeTd.textContent = "x"
 
-        
-        itemRow.append(nameTd, colorTd, sizeTd, quantityTd, removeTd)
+        itemRow.append(nameTd, colorTd, sizeTd, quantityTd, priceTd, blankTd, removeTd)
         cartTable.appendChild(itemRow)
     })
+
+        const subTotal = priceArr.reduce(function(total, price){return parseInt(total) + parseInt(price)})
+        const tax = subTotal * 0.725
+        const grandTotal = parseInt(subTotal) + parseInt(tax)
+
+        const subtotalTr = document.createElement("tr")
+        subtotalTr.innerHTML = `<td></td><td></td>
+        <td></td><td>Subtotal</td><td>$${subTotal}</td>
+        <td></td><td></td>`
+
+        const taxesTr = document.createElement("tr")
+        taxesTr.innerHTML = `<td></td><td></td>
+        <td></td><td>Tax 7.25%</td><td>$${tax}</td>
+        <td></td><td></td>`
+
+        const totalTr = document.createElement("tr")
+        totalTr.innerHTML = `<td></td><td></td>
+        <td></td><td font-weight"bold">Total</td><td>$${grandTotal}</td>
+        <td></td><td></td>`
+
+      cartTable.append(subtotalTr, taxesTr, totalTr)  
+
+    }
 }
+
+function updateQuantity(e){
+    
+    formData = {
+        quantity: e.target.value,
+    }
+    
+    configObj = {
+        method: "PATCH",
+        headers: {
+            "Content-Type" : "application/json",
+            "accept" : "application/json"
+        },
+        body: JSON.stringify(formData)
+    }
+
+    fetch("http://localhost:3000/cart_items" + `/${e.target.id}`, configObj)
+    .then(res => res.json())
+    .then(getCart)
 
 }
 
-function handleCartEvents(e){
+function deleteCartItem(e){
     if (e.target.className == "remove"){
         cartItemId = e.target.id
-
-        fetch("http://localhost:3000/cart_items" + `/${cartItemId}`, {
-        method: "DELETE"
-    })
-    .then(res => res.json())
-    .then(console.log("it was deleted"))
+    fetch("http://localhost:3000/cart_items" + `/${cartItemId}`, {method: "DELETE"})
+    .then(getCart)
     }
     
 }

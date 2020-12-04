@@ -1,13 +1,23 @@
 const navShirts = document.querySelector("#shirts")
 navShirts.addEventListener("click", getItems)
 
+const navCart = document.querySelector("#cart")
+navCart.addEventListener("click", getCart)
+
+//bigdiv
 const div = document.querySelector("#div-container")
 div.addEventListener("click", handleDivEvents)
 
+let cartTable = document.querySelector("#cart-table")
+cartTable.addEventListener("click", handleCartEvents)
+
+//innerdiv
 const divItemContainer = document.querySelector("#div-item-container")
+
 //div holding the shirt in purchase page
 const divItem = document.createElement("div")
 divItem.id = "div-item"
+
 //div holding the shirt's info and purchase form in purchase page
 const divInfo = document.createElement("div")
 divInfo.id = "div-info"
@@ -17,9 +27,9 @@ divForm.id = "div-select"
 
 
 
-
 getItems()
 createCart()
+let cartObj 
 
 function getItems(){
     div.innerHTML = ""
@@ -57,7 +67,7 @@ function handleDivEvents(e){
         .then(res => res.json())
         .then(item => showItem(item))
     }
-    // console.log(e.target)
+   
 
 }
 
@@ -86,15 +96,15 @@ function showItem(item){
     divForm.innerHTML = `
     <form>
     <div class="form-group">
-        <select class="form-control custom-select" id="selectQuantity" name="quantity">
-        <option>Quantity</option>
+        <select class="form-control custom-select" id="selectQuantity" name="quantity" required>
+        <option value="">Quantity</option>
         <option value="1">1</option>
         <option value="2">2</option>
         <option value="3">3</option>
         <option value="4">4</option>
         <option value="5">5</option>
         </select>
-    
+        
     
         <label for="exampleFormControlSelect1">Choose a color</label>
         <select class="form-control custom-select" id="selectColor" name="color">
@@ -102,7 +112,7 @@ function showItem(item){
    
     
         <label for="exampleFormControlSelect2">Choose a size</label>
-        <select multiple class="form-control custom-select" id="exampleFormControlSelect2" name="size">
+        <select multiple class="form-control custom-select" id="exampleFormControlSelect2" name="size" required>
         <option value="Extra Small">Extra Small</option>  
         <option value="Small">Small</option>
         <option value="Medium">Medium</option>
@@ -157,17 +167,108 @@ function showItem(item){
 
 function addToCart(e, item){
     e.preventDefault()
-
+    
     formData = {
         quantity: e.target.quantity.value,
         color: e.target.color.value,
         size: e.target.size.value,
         item_id: item.id,
-        cart_id: something 
+        cart_id: cartObj.id 
+    }
+    
+    configObj = {
+        method: "POST",
+        headers: {
+            "Content-Type" : "application/json",
+            "accept" : "application/json"
+        },
+        body: JSON.stringify(formData)
     }
 
+    fetch("http://localhost:3000/cart_items", configObj)
+    .then(res => res.json())
+    .then(reloadCart)
+}
+
+function reloadCart(){
+    alert("item(s) has been added to your cart!")
+    getCart()
+}
 
 
 
+function createCart(){
+    fetch("http://localhost:3000/carts", {
+        method: "POST",
+        headers: {
+            "Content-Type" : "application/json",
+            "accept" : "application/json"
+        }
+    })
+    .then(res => res.json())
+    .then(cart => cartObj = cart)
+}
+
+function getCart(){
+    
+    fetch("http://localhost:3000/cart_items")
+    .then(res => res.json())
+    .then(cart => viewCart(cart))
+}
+
+function viewCart(cart){
+
+    cartTable.innerHTML = ""
+    if (cart.length == 0 ){
+        cartTable.innerHTML = `<p>Your shopping cart is empty</p>`
+    }
+else {
+    cartTable.innerHTML = `<tr>
+    <th>Item Name</th>
+    <th>Color</th>
+    <th>Size</th>
+    <th>Quantity</th>
+    <th></th>
+</tr>`
+    
+    cart.forEach(cartItemObj => {
+        itemRow = document.createElement("tr")
+        nameTd = document.createElement("td")
+        nameTd.textContent = cartItemObj.item.name
+        
+        colorTd = document.createElement("td")
+        color = cartItemObj.color
+        colorTd.textContent = color.charAt(0).toUpperCase() + color.slice(1)
+
+        sizeTd = document.createElement("td")
+        sizeTd.textContent = cartItemObj.size
+
+        quantityTd = document.createElement("td")
+        quantityTd.textContent = cartItemObj.quantity
+
+        removeTd = document.createElement("td")
+        removeTd.className = "remove"
+        removeTd.id = cartItemObj.id
+        removeTd.textContent = "x"
+
+        
+        itemRow.append(nameTd, colorTd, sizeTd, quantityTd, removeTd)
+        cartTable.appendChild(itemRow)
+    })
+}
+
+}
+
+function handleCartEvents(e){
+    if (e.target.className == "remove"){
+        cartItemId = e.target.id
+
+        fetch("http://localhost:3000/cart_items" + `/${cartItemId}`, {
+        method: "DELETE"
+    })
+    .then(res => res.json())
+    .then(console.log("it was deleted"))
+    }
+    
 }
 

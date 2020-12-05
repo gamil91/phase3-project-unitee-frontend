@@ -16,12 +16,61 @@
 
     <body>
 
-        <!-- <div class="jumbotron jumbotron-fluid"> -->
-            <div class="container">
-              <img src="https://i.postimg.cc/XJ0spwFP/24e841de-6996-43b2-91b0-4b04210b0448-200x200.png" class="item-image">
-              <!-- <p class="lead">A one stop shop where there is a Tee for both U...N...I!</p> -->
+
+<!-- ModalForm  -->
+
+
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">New message</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="form-group">
+              <label for="recipient-name" class="col-form-label">Recipient:</label>
+              <input type="text" class="form-control" id="recipient-name">
             </div>
-          <!-- </div> -->
+            <div class="form-group">
+              <label for="message-text" class="col-form-label">Message:</label>
+              <textarea class="form-control" id="message-text"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button id="placeOrder-btn" class="btn btn-primary mb-2" data-html2canvas-ignore>Place Your Order</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+<!-- LogoBar  -->
+
+            <div class="container" id="logo-bar">
+                <img src="https://i.postimg.cc/W13xMLzP/logo1.png" class="item-image">
+                <div id="catchphrase">
+                    <h2>A one stop Tee shop for both u...N...i!</h2>
+                </div>
+            </div>
+          
 
 
 <!-- NavBar  -->
@@ -43,7 +92,11 @@
                         <table id="cart-table">
                             
                         </table>
-                        <button id="checkout-btn" class="btn btn-primary mb-2" data-html2canvas-ignore>Checkout Cart</button>
+                        <!-- <button id="checkOut-btn" type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo" data-html2canvas-ignore>Checkout Cart</button> -->
+
+
+
+                        <!-- <button id="placeOrder-btn" class="btn btn-primary mb-2" data-html2canvas-ignore>Place Your Order</button> -->
                     </div>
                 </div>
            
@@ -55,7 +108,9 @@
    
     
 
-        <div id="div-container" class="container"></div>
+ <!--- Repopulating divs ---->
+
+        <div id="div-container" class="container">
 
             <div id="div-item-container" class="row">
             </div>
@@ -68,8 +123,10 @@
 
     </body>
     
+
+
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script> 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
-    
     <script src="./index.js"></script>
 </html>

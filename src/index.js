@@ -36,8 +36,8 @@
 
 
     getItems()
-    // createCart()
-    // let cartObj 
+    createCart()
+    let cartObj 
 
     function getItems(){
         div.innerHTML = ""
@@ -173,7 +173,6 @@
 
     function addToCart(e, item){
         e.preventDefault()
-        cartObj = 218
 
         formData = {
             quantity: e.target.quantity.value,
@@ -194,11 +193,14 @@
 
         fetch("http://localhost:3000/cart_items", configObj)
         .then(res => res.json())
-        .then(reloadCart)
+        .then(addedItem => reloadCart(addedItem))
     }
 
-    function reloadCart(){
+    function reloadCart(addedItem){
         alert("item(s) has been added to your cart!")
+        
+        cartObj = addedItem.cart_id
+
         getCart()
     }
 
@@ -211,11 +213,8 @@
                     "accept" : "application/json"}
         })
         .then(res => res.json())
-        .then(cart => cartObj = cart)
+        .then(cart => cartObj = cart.id)
     }
-
-
-
 
 
 
@@ -233,15 +232,25 @@
 
     function viewCart(cart){
         
+        const emptyCart = document.querySelector("#emptyCart")
+        emptyCart.innerHTML = ""
+
         cartTable.innerHTML = ""
         if (cart.length == 0 ){
-            cartTable.innerHTML = `<p>is empty</p>`
-            // placeOrderBtn.disabled = true
-            // checkoutBtn.disabled = true
+           
+            emptyCart.textContent = "Boo! Your shopping cart is empty"
+
+            const receiptTitle = document.querySelector("#receiptTitle")
+            receiptTitle.innerHTML = ""
+        
+            const receiptCustomer = document.querySelector("#receiptCustomer")
+            receiptCustomer.innerHTML = ""
+
         }
         else {
-            // placeOrderBtn.disabled = false
-            // checkoutBtn.disabled = false
+            
+
+            emptyCart.innerHTML = `<img src="uniTeeLogo.png">Your Shopping Cart` 
             cartTable.innerHTML = `
         
         <tr>
@@ -313,36 +322,47 @@
             const grandTotal = parseFloat(subTotal) + parseFloat(tax)
 
             const subtotalTr = document.createElement("tr")
-            subtotalTr.innerHTML = `<td></td><td></td>
-            <td></td><td>Subtotal</td><td>$${subTotal}</td>
+            subtotalTr.innerHTML = `
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>Subtotal</td>
+                <td>$${subTotal}</td>
             `
 
             const taxesTr = document.createElement("tr")
-            taxesTr.innerHTML = `<td></td><td></td>
-            <td></td><td>Tax 7.25%</td><td>$${tax}</td>
-            `
+            taxesTr.innerHTML = `
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>Tax 7.25%</td>
+                <td>$${tax}</td>`
 
             const totalTr = document.createElement("tr")
-            totalTr.innerHTML = `<td></td><td></td>
-            <td></td><td style="font-weight:bold;">Total</td><td>$${grandTotal}</td>
-            `
+            totalTr.innerHTML = `
+                <td></td>
+                <td></td>
+                <td></td>
+                <td style="font-weight:bold;">Total</td>
+                <td>$${grandTotal}</td>`
 
             const checkoutBtnTr = document.createElement("tr")
-            checkoutBtnTr.innerHTML = `<td></td><td></td>
-            <td></td><td></td><td></td><td></td><td><button id="checkOut-btn" type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo" data-html2canvas-ignore>Checkout</button></td>
-            `
+            checkoutBtnTr.innerHTML = `
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td><button id="checkOut-btn" type="button" class="btn btn-primary" data-toggle="modal" data-target="#checkoutModal" data-html2canvas-ignore>Checkout</button></td>`
 
         cartTable.append(subtotalTr, taxesTr, totalTr, checkoutBtnTr)  
         
-            const checkoutBtn = document.getElementById("checkOut-btn")
-            checkoutBtn.addEventListener("click", checkOutCart) 
+        // const checkoutBtn = document.getElementById("checkOut-btn")
+        // // checkoutBtn.addEventListener("click", checkOutCart) 
         }
         
     }
-
-
-
-
 
 
 
@@ -383,31 +403,51 @@
     }
 
 
-    function checkOutCart(){
+
+
+    function placeOrder(e){
+
+        const customerName = e.target.parentElement.previousElementSibling.firstElementChild.customer.value
+
+        const customerAddress = e.target.parentElement.previousElementSibling.firstElementChild.address.value
+
+    
+
+        // const receiptCart = document.querySelector("#receiptCart")
+        
+        const receiptTitle = document.querySelector("#receiptTitle")
+        receiptTitle.innerHTML = ""
+        receiptTitle.innerHTML = `u n i T e e`
+        
+        const receiptCustomer = document.querySelector("#receiptCustomer")
+        receiptCustomer.innerHTML = ""
+        receiptCustomer.innerHTML = `<br/>Thank you for your purchase, ${customerName}! 
+        <br/>Shipping to: ${customerAddress}`
+        
+        
+        
+        // receiptCart.prepend(receiptTitle, receiptCustomer)
+        const receipt = document.querySelector("#collapseCart")
+        
+        const opt = {
+            margin: 0.5,
+            filename: 'uniTeeReceipt.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+        html2pdf().from(receipt).set(opt).save().then(destroyCart)
+
+        
+    } 
+
+
+    function destroyCart(){
+    
+        fetch("http://localhost:3000/carts" + `/${cartObj}`, {method: "DELETE"})
+        .then(getCart)
         
     }
-
-
-    function placeOrder (){
-        const receiptCart = document.querySelector("#receiptCart")
-        
-        const receiptTitle = document.createElement("h4")
-        receiptTitle.textContent = "uniTee Receipt"
-        
-        receiptCart.prepend(receiptTitle)
-        const receipt = document.querySelector("#collapseCart")
-
-    const opt = {
-        margin: 0.5,
-        filename: 'uniTeeReceipt.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-    };
-    html2pdf().from(receipt).set(opt).save().then(getCart)
-
-
-    } 
 
 
 

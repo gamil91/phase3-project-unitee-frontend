@@ -1,13 +1,32 @@
 
 
-    const navShirts = document.querySelector("#shirts")
-    navShirts.addEventListener("click", getItems)
+    // const navShirts = document.querySelector("#shirts")
+    // navShirts.addEventListener("click", getItems)
 
-    const navCart = document.querySelector("#cart")
-    navCart.addEventListener("click", getCart)
+    // const navSale = document.querySelector("#sale")
+    // navSale.addEventListener("click", getSaleItems)
 
-    // const checkoutBtn = document.getElementById("checkOut-btn")
-    // checkoutBtn.addEventListener("click", checkOutCart)
+    // const navCart = document.querySelector("#cart")
+    // navCart.addEventListener("click", getCart)
+
+
+    const navListener = document.querySelector("#navListener")
+    navListener.addEventListener("click", (e) => navButtons(e))
+
+    function navButtons(e){
+        if (e.target.id == "shirts"){
+            getItems()
+        }
+        else if (e.target.id == "cart"){
+            getCart()
+        }
+        else if (e.target.id == "sale"){
+            getSaleItems()
+        }
+    
+    }
+
+
 
     const placeOrderBtn = document.getElementById("placeOrder-btn")
     placeOrderBtn.addEventListener("click", placeOrder)
@@ -18,6 +37,8 @@
 
     let cartTable = document.querySelector("#cart-table")
     cartTable.addEventListener("click", deleteCartItem)
+
+    //----------------------------------->
 
     //innerdiv
     const divItemContainer = document.querySelector("#div-item-container")
@@ -34,10 +55,11 @@
     divForm.id = "div-select"
 
 
-
     getItems()
     createCart()
     let cartObj 
+    let colorsArr = []
+
 
     function getItems(){
         div.innerHTML = ""
@@ -48,7 +70,10 @@
         .then(loadColors)
     }
 
-    colorsArr = []
+
+
+
+    
     function showEachItem(item, color=""){
         div.innerHTML = ""
         div.divItemContainer = ""
@@ -56,6 +81,7 @@
         const divItemHome = document.createElement("div")
         divItemHome.className = "col-4"
         
+        //pushing available colors to load to the Navbar later
         item.images.forEach(image => {colorsArr.push(image.color)})
 
         const image = document.createElement("img")
@@ -65,10 +91,8 @@
 
         if (color != ""){
              sorted_image = item.images.find(image => image.color == color)
-             console.log(sorted_image.image_url)
              image.src = sorted_image.image_url
         }
-
 
         const p = document.createElement("p")
         p.textContent = item.name
@@ -78,13 +102,8 @@
         divItemContainer.appendChild(divItemHome)
         div.appendChild(divItemContainer)
 
-        if (color != ""){
-                 sorted_image = item.images.find(image => image.color == color)
-                 console.log(sorted_image.image_url)
-                 image.src = sorted_image.image_url
-            }
-
     }
+
 
     function loadColors(){
         const uniqueColors = []
@@ -119,6 +138,15 @@
         ))
     }
 
+    function getSaleItems(){
+        div.innerHTML = ""
+        divItemContainer.innerHTML = ""
+        fetch("http://localhost:3000/items/sales/true")
+        .then(res => res.json())
+        .then(items => items.forEach(item => (showEachItem(item))
+        ))
+    }
+
 
 
     function handleDivEvents(e){
@@ -145,9 +173,21 @@
         name.id = item.id
         name.textContent = item.name
 
+
         const price = document.createElement("p")
         price.id = item.id
-        price.textContent = `$ ${item.price}`
+        price.innerHTML = `$ ${item.price}`
+      
+        if(item.clearance == true){
+            const originalPrice = item.price
+            
+            const discount = Math.floor((originalPrice * 0.15)*100)/100
+            const withDiscount = originalPrice - discount      
+
+            price.innerHTML = ` <span style="color:red">$${item.price}</span>`.strike() + ` $${withDiscount}`
+        } 
+    
+
 
         const ulColor = document.createElement("ul")
         ulColor.id = "horizontal-list"
@@ -230,7 +270,7 @@
         
 
         const form = document.querySelector("#form-add")
-        form.addEventListener("submit", (e) => addToCart(e, item) )
+        form.addEventListener("submit", (e) => addToCart(e, item))
 
     }
 
@@ -310,8 +350,8 @@
             receiptCustomer.innerHTML = ""
 
         }
-        else {
-            
+        else 
+        {
 
             emptyCart.innerHTML = `<img src="uniTeeLogo.png">Your Shopping Cart` 
             cartTable.innerHTML = `
@@ -421,8 +461,7 @@
 
         cartTable.append(subtotalTr, taxesTr, totalTr, checkoutBtnTr)  
         
-        // const checkoutBtn = document.getElementById("checkOut-btn")
-        // // checkoutBtn.addEventListener("click", checkOutCart) 
+
         }
         
     }
@@ -474,9 +513,6 @@
 
         const customerAddress = e.target.parentElement.previousElementSibling.firstElementChild.address.value
 
-    
-
-        // const receiptCart = document.querySelector("#receiptCart")
         
         const receiptTitle = document.querySelector("#receiptTitle")
         receiptTitle.innerHTML = ""

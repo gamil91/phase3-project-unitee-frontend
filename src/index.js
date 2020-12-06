@@ -45,18 +45,30 @@
         fetch("http://localhost:3000/items")
         .then(res => res.json())
         .then(items => items.forEach(item => showEachItem(item)))
+        .then(loadColors)
     }
 
-    function showEachItem(item){
+    colorsArr = []
+    function showEachItem(item, color=""){
+        div.innerHTML = ""
+        div.divItemContainer = ""
 
         const divItemHome = document.createElement("div")
         divItemHome.className = "col-4"
         
+        item.images.forEach(image => {colorsArr.push(image.color)})
 
         const image = document.createElement("img")
         image.src = item.images[1].image_url
         image.className = "item-image"
         image.id = item.id
+
+        if (color != ""){
+             sorted_image = item.images.find(image => image.color == color)
+             console.log(sorted_image.image_url)
+             image.src = sorted_image.image_url
+        }
+
 
         const p = document.createElement("p")
         p.textContent = item.name
@@ -65,26 +77,69 @@
         divItemHome.append(image, p)
         divItemContainer.appendChild(divItemHome)
         div.appendChild(divItemContainer)
+
+        if (color != ""){
+                 sorted_image = item.images.find(image => image.color == color)
+                 console.log(sorted_image.image_url)
+                 image.src = sorted_image.image_url
+            }
+
+    }
+
+    function loadColors(){
+        const uniqueColors = []
+        colorsArr.forEach(color => {
+            if (!uniqueColors.includes(color)){
+                uniqueColors.push(color)
+            }
+        })
+
+        const colorDropdown = document.querySelector("#colorDropdown")
+        colorDropdown.innerHTML = ""
+        colorDropdown.addEventListener("click", sortByColor)
+        
+        uniqueColors.sort()
+        uniqueColors.forEach(color => {
+            const a = document.createElement("a")
+            a.textContent = color.charAt(0).toUpperCase() + color.slice(1)
+            a.className = "dropdown-item"
+            colorDropdown.appendChild(a)
+        })
     }
 
 
+    function sortByColor(e){
+        div.innerHTML = ""
+        divItemContainer.innerHTML = ""
+        const colorChoice = e.target.text.toLowerCase()
+        
+        fetch(`http://localhost:3000/items/sort/${colorChoice}`)
+        .then(res => res.json())
+        .then(items => items.forEach(item => (showEachItem(item, colorChoice))
+        ))
+    }
+
+
+
     function handleDivEvents(e){
+        
         if (e.target.className == "item-image" || e.target.matches('p')){ 
             divItemContainer.textContent = ""
             fetch("http://localhost:3000/items/" + e.target.id)
             .then(res => res.json())
-            .then(item => showItem(item))
+            .then(item => showItem(item, e.target.src))
         }
     }
 
-    function showItem(item){
+    function showItem(item, pic){
         //divItem -> div holding the shirt image
         divItem.textContent = ""
         divInfo.textContent = ""
         divForm.textContent = ""
 
+        
         const image = document.createElement("img")
-        image.src = item.images[1].image_url
+        image.src = pic
 
         const name = document.createElement("p")
         name.id = item.id
@@ -139,18 +194,23 @@
         div.appendChild(divItemContainer)
 
         //grabbing select from the DOM populating it with each item's image
-        const selectColor = document.querySelector("#selectColor");
-        
         ulColor.addEventListener("click", (e) =>{
             if (e.target.matches("button")){
             image.src = e.target.id
             }
-            
         })
+
+        const selectColor = document.querySelector("#selectColor");
+        selectColor.addEventListener("change", (e) => {
+            image.src = e.target[event.target.selectedIndex].dataset.image
+        })
+        
+        
             item.images.forEach(image => {
                 //creating options for the color selector
                 const color = image.color
                 const option = document.createElement("option");
+                option.dataset.image = image.image_url
                 option.value = color
                 option.text = color.charAt(0).toUpperCase() + color.slice(1);
                 //creating buttons for colors for preview
@@ -165,6 +225,9 @@
                 ulColor.appendChild(liColor)
                 selectColor.appendChild(option)
             })
+        
+       
+        
 
         const form = document.querySelector("#form-add")
         form.addEventListener("submit", (e) => addToCart(e, item) )

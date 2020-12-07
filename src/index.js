@@ -1,13 +1,32 @@
 
 
-    const navShirts = document.querySelector("#shirts")
-    navShirts.addEventListener("click", getItems)
+    // const navShirts = document.querySelector("#shirts")
+    // navShirts.addEventListener("click", getItems)
 
-    const navCart = document.querySelector("#cart")
-    navCart.addEventListener("click", getCart)
+    // const navSale = document.querySelector("#sale")
+    // navSale.addEventListener("click", getSaleItems)
 
-    // const checkoutBtn = document.getElementById("checkOut-btn")
-    // checkoutBtn.addEventListener("click", checkOutCart)
+    // const navCart = document.querySelector("#cart")
+    // navCart.addEventListener("click", getCart)
+
+
+    const navListener = document.querySelector("#navListener")
+    navListener.addEventListener("click", (e) => navButtons(e))
+
+    function navButtons(e){
+        if (e.target.id == "shirts"){
+            getItems()
+        }
+        else if (e.target.id == "cart"){
+            getCart()
+        }
+        else if (e.target.id == "sale"){
+            getSaleItems()
+        }
+    
+    }
+
+
 
     const placeOrderBtn = document.getElementById("placeOrder-btn")
     placeOrderBtn.addEventListener("click", placeOrder)
@@ -18,6 +37,8 @@
 
     let cartTable = document.querySelector("#cart-table")
     cartTable.addEventListener("click", deleteCartItem)
+
+    //----------------------------------->
 
     //innerdiv
     const divItemContainer = document.querySelector("#div-item-container")
@@ -34,10 +55,11 @@
     divForm.id = "div-select"
 
 
-
     getItems()
     createCart()
     let cartObj 
+    let colorsArr = []
+
 
     function getItems(){
         div.innerHTML = ""
@@ -45,18 +67,32 @@
         fetch("http://localhost:3000/items")
         .then(res => res.json())
         .then(items => items.forEach(item => showEachItem(item)))
+        .then(loadColors)
     }
 
-    function showEachItem(item){
+
+
+
+    
+    function showEachItem(item, color=""){
+        div.innerHTML = ""
+        div.divItemContainer = ""
 
         const divItemHome = document.createElement("div")
         divItemHome.className = "col-4"
         
+        //pushing available colors to load to the Navbar later
+        item.images.forEach(image => {colorsArr.push(image.color)})
 
         const image = document.createElement("img")
         image.src = item.images[1].image_url
         image.className = "item-image"
         image.id = item.id
+
+        if (color != ""){
+             sorted_image = item.images.find(image => image.color == color)
+             image.src = sorted_image.image_url
+        }
 
         const p = document.createElement("p")
         p.textContent = item.name
@@ -65,34 +101,89 @@
         divItemHome.append(image, p)
         divItemContainer.appendChild(divItemHome)
         div.appendChild(divItemContainer)
+
     }
 
 
+    function loadColors(){
+        const uniqueColors = []
+        colorsArr.forEach(color => {
+            if (!uniqueColors.includes(color)){
+                uniqueColors.push(color)
+            }
+        })
+
+        const colorDropdown = document.querySelector("#colorDropdown")
+        colorDropdown.innerHTML = ""
+        colorDropdown.addEventListener("click", sortByColor)
+        
+        uniqueColors.sort()
+        uniqueColors.forEach(color => {
+            const a = document.createElement("a")
+            a.textContent = color.charAt(0).toUpperCase() + color.slice(1)
+            a.className = "dropdown-item"
+            colorDropdown.appendChild(a)
+        })
+    }
+
+
+    function sortByColor(e){
+        div.innerHTML = ""
+        divItemContainer.innerHTML = ""
+        const colorChoice = e.target.text.toLowerCase()
+        
+        fetch(`http://localhost:3000/items/sort/${colorChoice}`)
+        .then(res => res.json())
+        .then(items => items.forEach(item => (showEachItem(item, colorChoice))
+        ))
+    }
+
+    function getSaleItems(){
+        div.innerHTML = ""
+        divItemContainer.innerHTML = ""
+        fetch("http://localhost:3000/items/sales/true")
+        .then(res => res.json())
+        .then(items => items.forEach(item => (showEachItem(item))
+        ))
+    }
+
+
+
     function handleDivEvents(e){
+        
         if (e.target.className == "item-image" || e.target.matches('p')){ 
             divItemContainer.textContent = ""
             fetch("http://localhost:3000/items/" + e.target.id)
             .then(res => res.json())
-            .then(item => showItem(item))
+            .then(item => showItem(item, e.target.src))
         }
     }
-
-    function showItem(item){
+    
+    function showItem(item, pic){
         //divItem -> div holding the shirt image
         divItem.textContent = ""
         divInfo.textContent = ""
         divForm.textContent = ""
-
+        
         const image = document.createElement("img")
-        image.src = item.images[1].image_url
+        image.src = pic
 
         const name = document.createElement("p")
         name.id = item.id
         name.textContent = item.name
 
+
         const price = document.createElement("p")
         price.id = item.id
-        price.textContent = `$ ${item.price}`
+        price.innerHTML = `$ ${item.price}`
+      
+        if(item.clearance == true){
+            const originalPrice = item.price
+            const discount = Math.floor((originalPrice * 0.15)*100)/100
+            const withDiscount = originalPrice - discount      
+            price.innerHTML = `<span style="color:red">$${item.price}</span>`.strike() + ` $${withDiscount}`
+        } 
+    
 
         const ulColor = document.createElement("ul")
         ulColor.id = "horizontal-list"
@@ -114,6 +205,7 @@
         
             <label for="exampleFormControlSelect1">Choose a color</label>
             <select class="form-control custom-select" id="selectColor" name="color">
+            <option id="color-holder"></option>
             </select>
     
         
@@ -139,20 +231,43 @@
         div.appendChild(divItemContainer)
 
         //grabbing select from the DOM populating it with each item's image
-        const selectColor = document.querySelector("#selectColor");
         
         ulColor.addEventListener("click", (e) =>{
             if (e.target.matches("button")){
-            image.src = e.target.id
+                image.src = e.target.id
             }
-            
         })
+        
+        let selectColorPlaceholder = document.querySelector("#color-holder")
+
+        const selectColor = document.querySelector("#selectColor");
+        selectColor.addEventListener("change", (e) => {
+            clickedColor = e.target[event.target.selectedIndex].dataset.image
+            image.src = clickedColor
+        })
+        
+      
+        //go through the item's images and find the specific image clicked to grab it's color
+        const colorPlaceholder = item.images.find(image => image.image_url == pic).color
+        // debugger
+        selectColorPlaceholder.value = colorPlaceholder
+        selectColorPlaceholder.text = colorPlaceholder.charAt(0).toUpperCase() + colorPlaceholder.slice(1)
+        selectColorPlaceholder.dataset.image = pic
+        selectColor.appendChild(selectColorPlaceholder)
+        
+        
             item.images.forEach(image => {
                 //creating options for the color selector
+                // debugger
                 const color = image.color
+                if (image.image_url != selectColorPlaceholder.dataset.image){
                 const option = document.createElement("option");
+                option.dataset.image = image.image_url
                 option.value = color
                 option.text = color.charAt(0).toUpperCase() + color.slice(1);
+
+                selectColor.appendChild(option)
+                }
                 //creating buttons for colors for preview
                 const liColor = document.createElement("li")
                 const btnColor = document.createElement("button")
@@ -163,11 +278,14 @@
                 
 
                 ulColor.appendChild(liColor)
-                selectColor.appendChild(option)
+                
             })
+        
+       
+        
 
         const form = document.querySelector("#form-add")
-        form.addEventListener("submit", (e) => addToCart(e, item) )
+        form.addEventListener("submit", (e) => addToCart(e, item))
 
     }
 
@@ -247,9 +365,8 @@
             receiptCustomer.innerHTML = ""
 
         }
-        else {
-            
-
+        else 
+        {
             emptyCart.innerHTML = `<img src="uniTeeLogo.png">Your Shopping Cart` 
             cartTable.innerHTML = `
         
@@ -262,8 +379,10 @@
                 <th data-html2canvas-ignore></th>
                 <th data-html2canvas-ignore>Remove</th>
         </tr>`
-
-        priceArr = []
+        
+        
+        
+        let subtotalCounter = 0
         cart.forEach(cartItemObj => {
             
             const itemRow = document.createElement("tr")
@@ -299,10 +418,23 @@
             quantityTd.appendChild(select)
 
             const priceTd = document.createElement("td")
-            const subtotal = `${cartItemObj.quantity * cartItemObj.item.price}`
+            priceTd.innerHTML = `${cartItemObj.quantity} x $${cartItemObj.item.price}`
+            let subItemTotal = `${cartItemObj.quantity * cartItemObj.item.price}`
             
-            priceArr.push(subtotal)
-            priceTd.textContent = `${cartItemObj.quantity} x $${cartItemObj.item.price}`
+            
+            if(cartItemObj.item.clearance == true){
+                //if the item is on sale, do some math!
+
+                const originalPrice = cartItemObj.item.price
+                const discount = Math.floor((originalPrice * 0.15)*100)/100
+                const discounted = originalPrice - discount      
+                    
+                subItemTotal = (cartItemObj.quantity * discounted).toFixed(2)
+                priceTd.innerHTML = `${cartItemObj.quantity} x ` + `<span style="color:red">$${discounted}</span>`
+            } 
+            
+            //for every calculated subItemTotal turned to float and added to the subtotalCounter
+            subtotalCounter += parseFloat(subItemTotal)
             
             const blankTd = document.createElement("td")
             blankTd.setAttribute('data-html2canvas-ignore','')
@@ -317,9 +449,9 @@
             cartTable.appendChild(itemRow)
         })
 
-            const subTotal = priceArr.reduce(function(total, price){return parseInt(total) + parseInt(price)})
-            const tax = Math.floor((subTotal * 0.0725)*100)/100        
-            const grandTotal = parseFloat(subTotal) + parseFloat(tax)
+    
+            const tax = Math.floor((subtotalCounter * 0.0725)*100)/100        
+            const grandTotal = (subtotalCounter + parseFloat(tax)).toFixed(2)
 
             const subtotalTr = document.createElement("tr")
             subtotalTr.innerHTML = `
@@ -327,7 +459,7 @@
                 <td></td>
                 <td></td>
                 <td>Subtotal</td>
-                <td>$${subTotal}</td>
+                <td>$${subtotalCounter}</td>
             `
 
             const taxesTr = document.createElement("tr")
@@ -358,8 +490,7 @@
 
         cartTable.append(subtotalTr, taxesTr, totalTr, checkoutBtnTr)  
         
-        // const checkoutBtn = document.getElementById("checkOut-btn")
-        // // checkoutBtn.addEventListener("click", checkOutCart) 
+
         }
         
     }
@@ -411,9 +542,6 @@
 
         const customerAddress = e.target.parentElement.previousElementSibling.firstElementChild.address.value
 
-    
-
-        // const receiptCart = document.querySelector("#receiptCart")
         
         const receiptTitle = document.querySelector("#receiptTitle")
         receiptTitle.innerHTML = ""
@@ -436,7 +564,7 @@
             html2canvas: { scale: 2 },
             jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
         };
-        html2pdf().from(receipt).set(opt).save().then(destroyCart)
+        html2pdf().from(receipt).set(opt).save().then(destroyCart).then(getItems)
 
         
     } 

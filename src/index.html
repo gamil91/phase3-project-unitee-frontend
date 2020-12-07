@@ -68,15 +68,32 @@
  <!-- NavBar  -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="collapse navbar-collapse" id="navbarNav" >
-          <ul class="navbar-nav">
-            <li class="nav-item active">
-              <a class="nav-link" id="shirts" href="#" >Home <span class="sr-only">(current)</span></a>
-              
-            </li>
+          <ul class="navbar-nav" id=navListener>
+
             <li class="nav-item">
-              <a class="nav-link" href="#">About</a>
-             
+                <div style="width:120px;"></div>
             </li>
+             
+
+            <li class="nav-item active">
+              <a class="nav-link" id="shirts" href="#" >All Shirts <span class="sr-only">(current)</span></a>
+            </li>
+
+
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Colors
+                </a>
+                <div id="colorDropdown" class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                    
+                </div>
+            </li>
+
+            <li class="nav-item active">
+                <a class="nav-link" id="sale" href="#" style="color:rgb(66, 179, 214);" >Sale! <span class="sr-only">(current)</span></a>
+              </li>
+
+
             <li class="nav-item nav-link" id="cart" data-toggle="collapse" data-target="#collapseCart" aria-expanded="false" aria-controls="collapseCart">Cart</li>
                 <div class="collapse" id="collapseCart">
                     <div class="card card-body" id="receiptCart">
@@ -90,9 +107,6 @@
                             
                         </table>
                         
-
-
-                        <!-- <button id="placeOrder-btn" class="btn btn-primary mb-2" data-html2canvas-ignore>Place Your Order</button> -->
                     </div>
                 </div>
            

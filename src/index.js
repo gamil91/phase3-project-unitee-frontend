@@ -367,7 +367,7 @@
         }
         else 
         {
-            emptyCart.innerHTML = `<img src="uniTeeLogo.png">Your Shopping Cart` 
+            emptyCart.innerHTML = `<img src="images/uniTeeLogo.png">Your Shopping Cart` 
             cartTable.innerHTML = `
         
         <tr>

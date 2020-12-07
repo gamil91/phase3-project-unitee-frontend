@@ -158,13 +158,12 @@
             .then(item => showItem(item, e.target.src))
         }
     }
-
+    
     function showItem(item, pic){
         //divItem -> div holding the shirt image
         divItem.textContent = ""
         divInfo.textContent = ""
         divForm.textContent = ""
-
         
         const image = document.createElement("img")
         image.src = pic
@@ -180,14 +179,11 @@
       
         if(item.clearance == true){
             const originalPrice = item.price
-            
             const discount = Math.floor((originalPrice * 0.15)*100)/100
             const withDiscount = originalPrice - discount      
-
-            price.innerHTML = ` <span style="color:red">$${item.price}</span>`.strike() + ` $${withDiscount}`
+            price.innerHTML = `<span style="color:red">$${item.price}</span>`.strike() + ` $${withDiscount}`
         } 
     
-
 
         const ulColor = document.createElement("ul")
         ulColor.id = "horizontal-list"
@@ -209,6 +205,7 @@
         
             <label for="exampleFormControlSelect1">Choose a color</label>
             <select class="form-control custom-select" id="selectColor" name="color">
+            <option id="color-holder"></option>
             </select>
     
         
@@ -234,25 +231,43 @@
         div.appendChild(divItemContainer)
 
         //grabbing select from the DOM populating it with each item's image
+        
         ulColor.addEventListener("click", (e) =>{
             if (e.target.matches("button")){
-            image.src = e.target.id
+                image.src = e.target.id
             }
         })
+        
+        let selectColorPlaceholder = document.querySelector("#color-holder")
 
         const selectColor = document.querySelector("#selectColor");
         selectColor.addEventListener("change", (e) => {
-            image.src = e.target[event.target.selectedIndex].dataset.image
+            clickedColor = e.target[event.target.selectedIndex].dataset.image
+            image.src = clickedColor
         })
+        
+      
+        //go through the item's images and find the specific image clicked to grab it's color
+        const colorPlaceholder = item.images.find(image => image.image_url == pic).color
+        // debugger
+        selectColorPlaceholder.value = colorPlaceholder
+        selectColorPlaceholder.text = colorPlaceholder.charAt(0).toUpperCase() + colorPlaceholder.slice(1)
+        selectColorPlaceholder.dataset.image = pic
+        selectColor.appendChild(selectColorPlaceholder)
         
         
             item.images.forEach(image => {
                 //creating options for the color selector
+                // debugger
                 const color = image.color
+                if (image.image_url != selectColorPlaceholder.dataset.image){
                 const option = document.createElement("option");
                 option.dataset.image = image.image_url
                 option.value = color
                 option.text = color.charAt(0).toUpperCase() + color.slice(1);
+
+                selectColor.appendChild(option)
+                }
                 //creating buttons for colors for preview
                 const liColor = document.createElement("li")
                 const btnColor = document.createElement("button")
@@ -263,7 +278,7 @@
                 
 
                 ulColor.appendChild(liColor)
-                selectColor.appendChild(option)
+                
             })
         
        
@@ -352,7 +367,6 @@
         }
         else 
         {
-
             emptyCart.innerHTML = `<img src="uniTeeLogo.png">Your Shopping Cart` 
             cartTable.innerHTML = `
         
@@ -365,8 +379,10 @@
                 <th data-html2canvas-ignore></th>
                 <th data-html2canvas-ignore>Remove</th>
         </tr>`
-
-        priceArr = []
+        
+        
+        
+        let subtotalCounter = 0
         cart.forEach(cartItemObj => {
             
             const itemRow = document.createElement("tr")
@@ -402,10 +418,23 @@
             quantityTd.appendChild(select)
 
             const priceTd = document.createElement("td")
-            const subtotal = `${cartItemObj.quantity * cartItemObj.item.price}`
+            priceTd.innerHTML = `${cartItemObj.quantity} x $${cartItemObj.item.price}`
+            let subItemTotal = `${cartItemObj.quantity * cartItemObj.item.price}`
             
-            priceArr.push(subtotal)
-            priceTd.textContent = `${cartItemObj.quantity} x $${cartItemObj.item.price}`
+            
+            if(cartItemObj.item.clearance == true){
+                //if the item is on sale, do some math!
+
+                const originalPrice = cartItemObj.item.price
+                const discount = Math.floor((originalPrice * 0.15)*100)/100
+                const discounted = originalPrice - discount      
+                    
+                subItemTotal = (cartItemObj.quantity * discounted).toFixed(2)
+                priceTd.innerHTML = `${cartItemObj.quantity} x ` + `<span style="color:red">$${discounted}</span>`
+            } 
+            
+            //for every calculated subItemTotal turned to float and added to the subtotalCounter
+            subtotalCounter += parseFloat(subItemTotal)
             
             const blankTd = document.createElement("td")
             blankTd.setAttribute('data-html2canvas-ignore','')
@@ -420,9 +449,9 @@
             cartTable.appendChild(itemRow)
         })
 
-            const subTotal = priceArr.reduce(function(total, price){return parseInt(total) + parseInt(price)})
-            const tax = Math.floor((subTotal * 0.0725)*100)/100        
-            const grandTotal = parseFloat(subTotal) + parseFloat(tax)
+    
+            const tax = Math.floor((subtotalCounter * 0.0725)*100)/100        
+            const grandTotal = (subtotalCounter + parseFloat(tax)).toFixed(2)
 
             const subtotalTr = document.createElement("tr")
             subtotalTr.innerHTML = `
@@ -430,7 +459,7 @@
                 <td></td>
                 <td></td>
                 <td>Subtotal</td>
-                <td>$${subTotal}</td>
+                <td>$${subtotalCounter}</td>
             `
 
             const taxesTr = document.createElement("tr")
@@ -535,7 +564,7 @@
             html2canvas: { scale: 2 },
             jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
         };
-        html2pdf().from(receipt).set(opt).save().then(destroyCart)
+        html2pdf().from(receipt).set(opt).save().then(destroyCart).then(getItems)
 
         
     } 

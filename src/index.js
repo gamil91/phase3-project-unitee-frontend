@@ -9,7 +9,6 @@
     // const navCart = document.querySelector("#cart")
     // navCart.addEventListener("click", getCart)
 
-
     const navListener = document.querySelector("#navListener")
     navListener.addEventListener("click", (e) => navButtons(e))
 
@@ -57,7 +56,8 @@
 
     getItems()
     createCart()
-    let cartObj 
+    let cartObj
+    let userObj = 0
     let colorsArr = []
 
 
@@ -69,8 +69,6 @@
         .then(items => items.forEach(item => showEachItem(item)))
         .then(loadColors)
     }
-
-
 
 
     
@@ -353,6 +351,7 @@
         const emptyCart = document.querySelector("#emptyCart")
         emptyCart.innerHTML = ""
 
+        cart = cart.filter(cart_items => cart_items.cart_id == cartObj)
         cartTable.innerHTML = ""
         if (cart.length == 0 ){
            
@@ -490,6 +489,8 @@
 
         cartTable.append(subtotalTr, taxesTr, totalTr, checkoutBtnTr)  
         
+        const checkout = document.querySelector("#checkOut-btn")
+        checkout.addEventListener("click", manipulateModal)
 
         }
         
@@ -542,32 +543,114 @@
 
         const customerAddress = e.target.parentElement.previousElementSibling.firstElementChild.address.value
 
-        
-        const receiptTitle = document.querySelector("#receiptTitle")
-        receiptTitle.innerHTML = ""
-        receiptTitle.innerHTML = `u n i T e e`
-        
-        const receiptCustomer = document.querySelector("#receiptCustomer")
-        receiptCustomer.innerHTML = ""
-        receiptCustomer.innerHTML = `<br/>Thank you for your purchase, ${customerName}! 
-        <br/>Shipping to: ${customerAddress}`
-        
-        
-        
-        // receiptCart.prepend(receiptTitle, receiptCustomer)
-        const receipt = document.querySelector("#collapseCart")
-        
-        const opt = {
-            margin: 0.5,
-            filename: 'uniTeeReceipt.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-        };
-        html2pdf().from(receipt).set(opt).save().then(destroyCart).then(getItems)
+        if (e.target.innerText == "Place your Order" ) {
+            // If a guest is checking out, create a pdf and download then destroy the cart
+            
+            if (userObj == 0) {
+                const receiptTitle = document.querySelector("#receiptTitle")
+                receiptTitle.innerHTML = ""
+                receiptTitle.innerHTML = `u n i T e e`
+                
+                const receiptCustomer = document.querySelector("#receiptCustomer")
+                receiptCustomer.innerHTML = ""
+                receiptCustomer.innerHTML = `<br/>Thank you for your purchase, ${customerName}! 
+                <br/>Shipping to: ${customerAddress}`
+                
+                // receiptCart.prepend(receiptTitle, receiptCustomer)
+                const receipt = document.querySelector("#collapseCart")
+                
+                const opt = {
+                    margin: 0.5,
+                    filename: 'uniTeeReceipt.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+                };
+                html2pdf().from(receipt).set(opt).save().then(destroyCart).then(() => {
+                    cartObj = 0
+                    getCart
+                })
+            }
+                //If user Obj exists then take the items from the cart and create a purchase join
+            else 
+            {
+                // debugger
+                formData = {
+                    name: customerName,
+                    address: customerAddress,
+                    user_id: userObj.id
+                }
+                
+                configObj = {
+                    method: "POST",
+                    headers: {
+                        "Content-Type" : "application/json",
+                        "accept" : "application/json"
+                    },
+                    body: JSON.stringify(formData)
+                }
+                //moving user's cart items to user's purchased items
+                fetch("http://localhost:3000/purchases", configObj)
+                .then(res => res.json())
+                .then(getCart)
 
-        
+            }
+
+            e.target.parentElement.previousElementSibling.firstElementChild.customer.value = ""
+            e.target.parentElement.previousElementSibling.firstElementChild.address.value = ""
+
+
+        }
+        else if (e.target.innerText == "Sign up or Log in") 
+        { login(e)}
     } 
+
+
+
+
+
+    function login(e){
+
+            signIn.innerHTML = ""
+
+            logOutLi = document.querySelector("#logoutLi")
+            logOutLi.style.display = 'block'
+          
+
+            purchaseLi = document.querySelector("#purchaseHistory")
+            purchaseLi.addEventListener("click", getPurchases)
+            purchaseLi.style.display = 'block'
+            
+
+            let userName = e.target.parentElement.previousElementSibling.firstElementChild.customer.value
+
+            let userAddress = e.target.parentElement.previousElementSibling.firstElementChild.address.value
+        // debugger
+            formData = {
+                name: userName,
+                email: userAddress
+            }
+            
+            configObj = {
+                method: "POST",
+                headers: {
+                    "Content-Type" : "application/json",
+                    "accept" : "application/json"
+                },
+                body: JSON.stringify(formData)
+            }
+    
+            fetch("http://localhost:3000/users", configObj)
+            .then(res => res.json())
+            .then(user => {
+                userObj = user
+                cartObj = user.cart.id
+                e.target.parentElement.previousElementSibling.firstElementChild.customer.value = ""
+                e.target.parentElement.previousElementSibling.firstElementChild.address.value = ""
+                    }     
+                )
+
+    }
 
 
     function destroyCart(){
@@ -575,9 +658,103 @@
         fetch("http://localhost:3000/carts" + `/${cartObj}`, {method: "DELETE"})
         .then(getCart)
         
+        
+    }
+
+//-----------> Stretch
+
+
+    signIn = document.querySelector("#sign-in")
+    signIn.addEventListener("click", manipulateModal)
+
+    function manipulateModal(e){
+        
+        title =  document.querySelector(".modal-title")
+        address = document.querySelector("#address")
+        modalBtnForm = document.querySelector("#placeOrder-btn") 
+        backBtn = document.querySelector("#back-btn")
+       
+
+        if (e.target.id == "sign-in"){
+            title.innerHTML = "Sign up or Log in"
+            address.innerHTML = "Email Address"
+            modalBtnForm.innerHTML = "Sign up or Log in"
+            backBtn.innerHTML = "No, thanks"
+        }
+        
+        else if (e.target.id == "checkOut-btn"){
+            title.innerHTML = "Shipping Information"
+            address.innerHTML = "Email Address"
+            modalBtnForm.innerHTML = "Place your Order"
+            backBtn.innerHTML = "Back to Cart"
+        }
+
+    }
+
+
+    const logoutNav = document.querySelector("#logoutNav")
+    logoutNav.addEventListener("click", logout)
+
+
+    function logout(e){
+        logOutLi.style.display = 'none'
+        purchaseLi.style.display = 'none'
+        signIn.innerHTML = "Sign In"
+        cartObj = 0
+        userObj = 0
+        getItems()
     }
 
 
 
+    function getPurchases(){
+      
+        fetch("http://localhost:3000/purchases")
+        .then(res => res.json())
+        .then(purchases => orderHistory(purchases))
+    }
+
+    
+    function orderHistory(purchases){
+        
+        divPurchases = document.createElement("div")
+        divPurchases.innerHTML = ""
+        divPurchases.id = "divPurchase"
+        divPurchases.innerHTML = `<h1>Order History<hr></h1>`
+        
+        div.innerHTML = ""
+        divItemContainer.innerHTML = ""
+        
+        orders = purchases.filter(p => p.user_id == userObj.id)
+
+        if (orders.length == 0){
+            divPurchases.innerHTML = `<h3>Order History<hr></h3>
+            <h4>NOTHING!</h4>`
+        }
+        
+        orders.forEach(order =>{
+
+            olDate = document.createElement("ul")
+                d = new Date(order.created_at)
+                date = (d.getMonth()+1)  + "/" + d.getDate()  + "/" + d.getFullYear()
+            olDate.innerHTML = `<strong>Shipped to ${order.name} at ${order.address} on ${date}</strong>`
+            
+
+            order.cart_items.forEach(purchasedItem => {
+                liPurchased = document.createElement("li")
+                liPurchased.id = purchasedItem.id
+                num = purchasedItem.quantity
+                size = purchasedItem.size
+                color = purchasedItem.color
+                liPurchased.textContent = `${num} x ${size} ${color}`
+                olDate.appendChild(liPurchased)
+            })
+            divPurchases.appendChild(olDate)
+        })
+        divItemContainer.appendChild(divPurchases)
+        div.appendChild(divItemContainer)
+
+
+    }
 
 

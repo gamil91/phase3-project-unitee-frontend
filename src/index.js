@@ -474,8 +474,8 @@
                 <td></td>
                 <td></td>
                 <td></td>
-                <td style="font-weight:bold;">Total</td>
-                <td>$${grandTotal}</td>`
+                <td  style="font-weight:bold;">Total</td>
+                <td id= "grandTotal">$${grandTotal}</td>`
 
             const checkoutBtnTr = document.createElement("tr")
             checkoutBtnTr.innerHTML = `
@@ -573,14 +573,17 @@
             }
                 //If user Obj exists then take the items from the cart and create a purchase join
             else 
-            {
-                // debugger
+            {   
+                grandTotal = document.querySelector("#grandTotal")
+                orderTotal = grandTotal.innerText
+               
                 formData = {
                     name: customerName,
                     address: customerAddress,
+                    price: orderTotal,
                     user_id: userObj.id
                 }
-                
+                //  debugger
                 configObj = {
                     method: "POST",
                     headers: {
@@ -677,14 +680,14 @@
 
         if (e.target.id == "sign-in"){
             title.innerHTML = "Sign up or Log in"
-            address.innerHTML = "Email Address"
+            address.innerHTML = "Email Address:"
             modalBtnForm.innerHTML = "Sign up or Log in"
             backBtn.innerHTML = "No, thanks"
         }
         
         else if (e.target.id == "checkOut-btn"){
             title.innerHTML = "Shipping Information"
-            address.innerHTML = "Email Address"
+            address.innerHTML = "Address:"
             modalBtnForm.innerHTML = "Place your Order"
             backBtn.innerHTML = "Back to Cart"
         }
@@ -716,7 +719,7 @@
 
     
     function orderHistory(purchases){
-        
+        // debugger
         divPurchases = document.createElement("div")
         divPurchases.innerHTML = ""
         divPurchases.id = "divPurchase"
@@ -726,18 +729,18 @@
         divItemContainer.innerHTML = ""
         
         orders = purchases.filter(p => p.user_id == userObj.id)
-
+        // debugger
         if (orders.length == 0){
             divPurchases.innerHTML = `<h3>Order History<hr></h3>
             <h4>NOTHING!</h4>`
         }
         
         orders.forEach(order =>{
-
+        // debugger
             olDate = document.createElement("ul")
                 d = new Date(order.created_at)
                 date = (d.getMonth()+1)  + "/" + d.getDate()  + "/" + d.getFullYear()
-            olDate.innerHTML = `<strong>Shipped to ${order.name} at ${order.address} on ${date}</strong>`
+            olDate.innerHTML = `<strong>Shipped to ${order.name} at ${order.address} on ${date} for ${order.price}</strong>`
             
 
             order.cart_items.forEach(purchasedItem => {
@@ -745,7 +748,7 @@
                 liPurchased.id = purchasedItem.id
                 num = purchasedItem.quantity
                 size = purchasedItem.size
-                color = purchasedItem.color
+                color = purchasedItem.color.charAt(0).toUpperCase() + purchasedItem.color.slice(1)
                 liPurchased.textContent = `${num} x ${size} ${color}`
                 olDate.appendChild(liPurchased)
             })

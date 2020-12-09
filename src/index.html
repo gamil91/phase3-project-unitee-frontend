@@ -41,13 +41,13 @@
                 <input type="text" class="form-control" id="recipient-name" name="customer">
                 </div>
                 <div class="form-group">
-                <label for="address-text" class="col-form-label">Address:</label>
+                <label for="address-text" id="address" class="col-form-label">Address:</label>
                 <input type="text" class="form-control" id="address-text" name="address">
                 </div>
             </form>
             </div>
             <div class="modal-footer">
-            <button type="button" class="btn btn-secondary mb-2" data-dismiss="modal">Back to Cart</button>
+            <button type="button" id= "back-btn" class="btn btn-secondary mb-2" data-dismiss="modal">Back to Cart</button>
             <button id="placeOrder-btn" class="btn btn-primary mb-2" data-dismiss="modal" >Place Your Order</button>
             </div>
         </div>
@@ -85,7 +85,7 @@
             </li>
 
 
-            <li class="nav-item dropdown">
+            <li class="nav-item dropdown active">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Colors
                 </a>
@@ -99,7 +99,7 @@
               </li>
 
 
-            <li class="nav-item nav-link" id="cart" data-toggle="collapse" data-target="#collapseCart" aria-expanded="false" aria-controls="collapseCart">Cart</li>
+            <li class="nav-item nav-link active" id="cart" data-toggle="collapse" data-target="#collapseCart" aria-expanded="false" aria-controls="collapseCart">Cart</li>
                 <div class="collapse" id="collapseCart">
                     <div class="card card-body" id="receiptCart">
                         
@@ -114,6 +114,25 @@
                         
                     </div>
                 </div>
+
+                <li class="nav-item active">
+                    <a class="nav-link" id="sign-in" href="#"data-toggle="modal" data-target="#checkoutModal" data-whatever="@fat" >Sign In <span class="sr-only">(current)</span></a>
+                </li>
+
+
+                <li class="nav-item active" style="display:none" id="purchaseHistory">
+                    <a class="nav-link"  href="#" >Order History</a>
+                  </li>
+
+
+                <li class="nav-item active" id="logoutLi"     style="display:none" >
+                    <a class="nav-link" id="logoutNav" href="#" >Log Out <span class="sr-only">(current)</span></a>
+                  </li>
+
+
+        
+
+
            
           </ul>
         </div>

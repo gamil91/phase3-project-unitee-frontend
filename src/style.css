@@ -101,6 +101,11 @@ body#body {
  }
 
 
+ ul {
+  list-style-type: none;
+  padding: 2px;
+}
+
 
  ul#horizontal-list {
   text-align: center;
@@ -124,3 +129,4 @@ h3 {
   font-family: 'Rock Salt', cursive;
   
 }
+

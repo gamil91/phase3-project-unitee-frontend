@@ -4,4 +4,4 @@
 
 ## Screenshots
 
-![Home Page](https://github.com/gamil91/SAMtify/blob/main/src/images/home.png)
+![Home Page](https://github.com/gamil91/phase3-project-unitee-frontend/blob/main/src/images/home.png)

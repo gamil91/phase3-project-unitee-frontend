@@ -54,6 +54,7 @@ This website was my very first solo project since I started learning how to code
 - In the frontend repo, run open index.html (this will not render anything until the server is up on the backend)
 
 - Clone the backend repo (https://github.com/gamil91/phase3-project-unitee-backend-again)
+- Run bundle install
 - Run rails db:migrate
 - Run rails db:seed
 - In the backend repo, run rails s to open your server

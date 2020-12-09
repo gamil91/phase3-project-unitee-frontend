@@ -1,14 +1,5 @@
 
 
-    // const navShirts = document.querySelector("#shirts")
-    // navShirts.addEventListener("click", getItems)
-
-    // const navSale = document.querySelector("#sale")
-    // navSale.addEventListener("click", getSaleItems)
-
-    // const navCart = document.querySelector("#cart")
-    // navCart.addEventListener("click", getCart)
-
     const navListener = document.querySelector("#navListener")
     navListener.addEventListener("click", (e) => navButtons(e))
 
@@ -24,8 +15,6 @@
         }
     
     }
-
-
 
     const placeOrderBtn = document.getElementById("placeOrder-btn")
     placeOrderBtn.addEventListener("click", placeOrder)
@@ -568,7 +557,7 @@
                 };
                 html2pdf().from(receipt).set(opt).save().then(destroyCart).then(() => {
                     cartObj = 0
-                    getCart
+                    getItems()
                 })
             }
                 //If user Obj exists then take the items from the cart and create a purchase join
@@ -728,7 +717,7 @@
         div.innerHTML = ""
         divItemContainer.innerHTML = ""
         
-        orders = purchases.filter(p => p.user_id == userObj.id)
+        orders = purchases.filter(p => p.user_id == userObj.id).reverse()
         // debugger
         if (orders.length == 0){
             divPurchases.innerHTML = `<h3>Order History<hr></h3>

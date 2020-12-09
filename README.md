@@ -50,7 +50,7 @@ This website was my very first solo project since I started learning how to code
 
 ## Installation
 
-- Clone this repo (frontend)
+- Clone this repo (https://github.com/gamil91/phase3-project-unitee-frontend)
 - In the frontend repo, run open index.html (this will not render anything until the server is up on the backend)
 
 - Clone the backend repo (https://github.com/gamil91/phase3-project-unitee-backend-again)

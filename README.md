@@ -28,6 +28,7 @@ This website was my very first solo project since I started learning how to code
 - Javascript
 - CSS
 - HTML
+- html2pdf
 
 ## Features & Highlights
 

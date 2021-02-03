@@ -63,5 +63,5 @@ This website was my very first solo project since I started learning how to code
 
 ## Video Demo
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/yzwBpE-3kwI" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+https://www.youtube.com/watch?v=yzwBpE-3kwI&feature=youtu.be
 

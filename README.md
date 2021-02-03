@@ -61,4 +61,7 @@ This website was my very first solo project since I started learning how to code
 - In the backend repo, run rails s to open your server
 - You'll know when the server is up and running when you see "Listening on tcp://[::1]:3000" or go to "http://localhost:3000/"
 
+## Video Demo
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/yzwBpE-3kwI" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
